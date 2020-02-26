@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"casual-talk/data"
 	"errors"
+	"fmt"
+	"html/template"
 )
 
 func Session(writer http.ResponseWriter, request *http.Request) (sess data.Session, err error) {
@@ -17,3 +19,11 @@ func Session(writer http.ResponseWriter, request *http.Request) (sess data.Sessi
 	return
 }
 
+func GenerateHTML(writer http.ResponseWriter, data interface{}, fn ...string) {
+	var files []string
+	for _, file := range fn {
+		files = append(files, fmt.Sprintf("templates/%s.html", file))
+	}
+	templates := template.Must(template.ParseFiles(files...))
+	templates.ExecuteTemplate(writer, "layout", data)
+}

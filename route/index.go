@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"casual-talk/data"
 	"casual-talk/utils"
-	"html/template"
 )
 
 // GET /err?msg=
@@ -16,22 +15,10 @@ func Err(writer http.ResponseWriter, request *http.Request) {
 func Index(writer http.ResponseWriter, request *http.Request) {
 	threads, err := data.Threads(); if err == nil {
 		_, err := utils.Session(writer, request)
-		publicTmplFiles := []string{
-			"templates/layout.html",
-			"templates/public.navbar.html",
-			"templates/index.html",
-		}
-		privateTmplFiles := []string{
-			"templates/layout.html",
-			"templates/private.navbar.html",
-			"templates/index.html",
-		}
-		var templates *template.Template
 		if err != nil {
-			templates = template.Must(template.ParseFiles(privateTmplFiles...))
+			utils.GenerateHTML(writer, threads, "layout", "public.navbar", "index")
 		} else {
-			templates = template.Must(template.ParseFiles(publicTmplFiles...))
+			utils.GenerateHTML(writer, threads, "layout", "private.navbar", "index")
 		}
-		templates.ExecuteTemplate(writer, "layout", threads)
 	}
 }
