@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"crypto/sha1"
 	"crypto/rand"
+	"casual-talk/utils"
 )
 
 type sqlInfo struct {
@@ -36,13 +37,13 @@ func init() {
 func loadSqlInfo() {
 	file, err := os.Open("data/sql.json")
 	if err != nil {
-		log.Fatalln("Cannot open sql file", err)
+		utils.Danger("Cannot open sql file", err)
 	}
 	decoder := json.NewDecoder(file)
 	info = sqlInfo{}
 	err = decoder.Decode(&info)
 	if err != nil {
-		log.Fatalln("Cannot get configuration from file", err)
+		utils.Danger("Cannot get configuration from file", err)
 	}
 }
 
@@ -52,7 +53,7 @@ func createUUID() (uuid string) {
 	u := new([16]byte)
 	_, err := rand.Read(u[:])
 	if err != nil {
-		log.Fatalln("Cannot generate UUID", err)
+		utils.Danger("Cannot generate UUID", err)
 	}
 
 	// 0x40 is reserved variant from RFC 4122

@@ -10,7 +10,7 @@ import (
 // shows the error message page
 func Err(writer http.ResponseWriter, request *http.Request) {
 	vals := request.URL.Query()
-	_, err := utils.Session(writer, request)
+	_, err := data.SessionCheck(writer, request)
 	if err != nil {
 		utils.GenerateHTML(writer, vals.Get("msg"), "layout", "public.navbar", "error")
 	} else {
@@ -21,7 +21,7 @@ func Err(writer http.ResponseWriter, request *http.Request) {
 func Index(writer http.ResponseWriter, request *http.Request) {
 	threads, err := data.Threads()
 	if err == nil {
-		_, err := utils.Session(writer, request)
+		_, err := data.SessionCheck(writer, request)
 		if err != nil {
 			utils.GenerateHTML(writer, threads, "layout", "public.navbar", "index")
 		} else {

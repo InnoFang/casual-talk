@@ -2,22 +2,21 @@ package utils
 
 import (
 	"net/http"
-	"casual-talk/data"
-	"errors"
 	"fmt"
 	"html/template"
 	"strings"
+	"log"
+	"os"
 )
 
-func Session(writer http.ResponseWriter, request *http.Request) (sess data.Session, err error) {
-	cookie, err := request.Cookie("_cookie")
-	if err == nil {
-		sess = data.Session{Uuid: cookie.Value}
-		if ok, _ := sess.Check(); ok {
-			err = errors.New("invalid session")
-		}
+var logger *log.Logger
+
+func init() {
+	file, err := os.OpenFile("casual-talk.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalln("Failed to open log file", err)
 	}
-	return
+	logger = log.New(file, "[INFO] ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 // parse HTML templates
@@ -45,4 +44,20 @@ func GenerateHTML(writer http.ResponseWriter, data interface{}, fn ...string) {
 func ErrorMessage(writer http.ResponseWriter, request *http.Request, msg string) {
 	url := []string{"/err?msg=", msg}
 	http.Redirect(writer, request, strings.Join(url, ""), 302)
+}
+
+// log
+func Info(args ...interface{}) {
+	logger.SetPrefix("[INFO] ")
+	logger.Println(args...)
+}
+
+func Danger(args ...interface{}) {
+	logger.SetPrefix("[ERROR] ")
+	logger.Println(args...)
+}
+
+func Warn(args ...interface{}) {
+	logger.SetPrefix("[WARN] ")
+	logger.Println(args...)
 }

@@ -5,7 +5,6 @@ import (
 	"casual-talk/data"
 	"casual-talk/utils"
 	"time"
-	"log"
 )
 
 // GET /login
@@ -26,7 +25,7 @@ func Signup(writer http.ResponseWriter, request *http.Request) {
 func SignupAccount(writer http.ResponseWriter, request *http.Request) {
 	err := request.ParseForm()
 	if err != nil {
-		log.Fatalln(err, "Cannot parse form")
+		utils.Danger(err, "Cannot parse form")
 	}
 	user := data.User{
 		Name:     request.PostFormValue("name"),
@@ -34,7 +33,7 @@ func SignupAccount(writer http.ResponseWriter, request *http.Request) {
 		Password: request.PostFormValue("password"),
 	}
 	if err := user.Create(); err != nil {
-		log.Fatalln(err, "Cannot create user")
+		utils.Danger(err, "Cannot create user")
 	}
 	http.Redirect(writer, request, "/login", 302)
 }
@@ -45,12 +44,12 @@ func Authenticate(writer http.ResponseWriter, request *http.Request) {
 	request.ParseForm()
 	user, err := data.UserByEmail(request.PostFormValue("email"))
 	if err != nil {
-		log.Fatalln(err, "Cannot find user")
+		utils.Danger(err, "Cannot find user")
 	}
 	if user.Password == data.Encrypt(request.PostFormValue("password")) {
 		session, err := user.CreateSession()
 		if err != nil {
-			log.Fatalln(err, "Cannot find user")
+			utils.Danger(err, "Cannot find user")
 		}
 		cookie := http.Cookie{
 			Name:     "_cookie",
@@ -75,7 +74,7 @@ func Logout(writer http.ResponseWriter, request *http.Request) {
 		cookie.Expires = time.Unix(1, 0)
 		http.SetCookie(writer, cookie)
 	} else {
-		log.Fatalln(err, "Failed to get cookie")
+		utils.Warn(err, "Failed to get cookie")
 	}
 	http.Redirect(writer, request, "/", 302)
 }

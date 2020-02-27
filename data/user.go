@@ -15,7 +15,7 @@ type User struct {
 // create a new thread
 func (user *User) CreateThread(topic string) (conv Thread, err error) {
 	stmt, err := Db.Prepare(
-		"INSERT INTO threads(uuid, topic, user_id, created_at) VALUES($1, $2, $3, $4) RETURNING id, uuid, topic, user_id, created_at")
+		"INSERT INTO threads(uuid, topic, user_id, created_at) VALUES(?, ?, ?, ?) RETURNING id, uuid, topic, user_id, created_at")
 	defer stmt.Close()
 	if err != nil {
 		return
@@ -27,7 +27,7 @@ func (user *User) CreateThread(topic string) (conv Thread, err error) {
 // create a new post to a thread
 func (user *User) CreatePost(conv Thread, body string) (post Post, err error) {
 	stmt, err := Db.Prepare(
-		"INSERT INTO posts(uuid, body, user_id, thread_id, created_at) VALUES($1, $2, $3, $4, $5) RETURNING id, uuid, body, user_id, thread_id, created_at")
+		"INSERT INTO posts(uuid, body, user_id, thread_id, created_at) VALUES(?, ?, ?, ?, ?) RETURNING id, uuid, body, user_id, thread_id, created_at")
 	defer stmt.Close()
 	if err != nil {
 		return
@@ -39,7 +39,7 @@ func (user *User) CreatePost(conv Thread, body string) (post Post, err error) {
 // create a new session for an existing user
 func (user *User) CreateSession() (session Session, err error) {
 	stmt, err := Db.Prepare(
-		"INSERT INTO sessions(uuid, email, user_id, created_at) VALUES($1, $2, $3, $4) RETURNING id, uuid, email, user_id, created_at")
+		"INSERT INTO sessions(uuid, email, user_id, created_at) VALUES(?, ?, ?, ?) RETURNING id, uuid, email, user_id, created_at")
 	defer stmt.Close()
 	if err != nil {
 		return
@@ -51,7 +51,7 @@ func (user *User) CreateSession() (session Session, err error) {
 // get the session for an existing user
 func (user *User) Session() (session Session, err error) {
 	session = Session{}
-	err = Db.QueryRow("SELECT id, uuid, email, user_id, created_at FROM sessions WHERE user_id=$1", user.Id).
+	err = Db.QueryRow("SELECT id, uuid, email, user_id, created_at FROM sessions WHERE user_id=?", user.Id).
 		Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
 	return
 }
@@ -59,19 +59,20 @@ func (user *User) Session() (session Session, err error) {
 // create a new user, save user info into the database
 func (user *User) Create() (err error) {
 	stmt, err := Db.Prepare(
-		"INSERT INTO users(uuid, name, email, password, created_at) VALUES($1, $2, $3, $4, $5) RETURNING id, uuid, created_at")
+		"INSERT INTO users(uuid, name, email, password, created_at) VALUES(?, ?, ?, ?, ?) RETURNING id, uuid, created_at")
 	defer stmt.Close()
 	if err != nil {
 		return
 	}
 
-	err = stmt.QueryRow(createUUID(), user.Name, user.Email, Encrypt(user.Password), time.Now()).Scan(&user.Id, &user.Uuid, &user.CreatedAt)
+	err = stmt.QueryRow(createUUID(), user.Name, user.Email, Encrypt(user.Password), time.Now()).
+				Scan(&user.Id, &user.Uuid, &user.CreatedAt)
 	return
 }
 
 // delete user from database
 func (user *User) Delete() (err error) {
-	stmt, err := Db.Prepare("DELETE FROM users WHERE id=$1")
+	stmt, err := Db.Prepare("DELETE FROM users WHERE id=?")
 	if err != nil {
 		return
 	}
@@ -83,14 +84,14 @@ func (user *User) Delete() (err error) {
 
 // update user information in the database
 func (user *User) Update() (err error) {
-	statement := "UPDATE users SET name=$2, email=$3 where id=$1"
+	statement := "UPDATE users SET name=?, email=? where id=?"
 	stmt, err := Db.Prepare(statement)
 	defer stmt.Close()
 	if err != nil {
 		return
 	}
 
-	_, err = stmt.Exec(user.Id, user.Name, user.Email)
+	_, err = stmt.Exec(user.Name, user.Email, user.Id)
 	return
 }
 
@@ -120,7 +121,7 @@ func Users() (users []User, err error) {
 // get a single user given the email
 func UserByEmail(email string) (user User, err error) {
 	user = User{}
-	err = Db.QueryRow("SELECT id, uuid, name, email, password, created_at FROM users WHERE email=$1", email).
+	err = Db.QueryRow("SELECT id, uuid, name, email, password, created_at FROM users WHERE email=?", email).
 		Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.Password, &user.CreatedAt)
 	return
 }
@@ -128,7 +129,7 @@ func UserByEmail(email string) (user User, err error) {
 // get a single user given the UUID
 func UserByUUID(uuid string) (user User, err error) {
 	user = User{}
-	err = Db.QueryRow("SELECT id, uuid, name, email, password, created_at FROM users WHERE uuid=$1", uuid).
+	err = Db.QueryRow("SELECT id, uuid, name, email, password, created_at FROM users WHERE uuid=?", uuid).
 		Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.Password, &user.CreatedAt)
 	return
 }

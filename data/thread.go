@@ -19,7 +19,7 @@ func (thread *Thread) CreatedAtDate() string {
 
 // get the number of posts in a thread
 func (thread *Thread) NumReplies() (count int) {
-	rows, err := Db.Query("SELECT count(*) FROM posts where thread_id=$1", thread.Id)
+	rows, err := Db.Query("SELECT count(*) FROM posts where thread_id=?", thread.Id)
 	defer rows.Close()
 	if err != nil {
 		return
@@ -34,7 +34,7 @@ func (thread *Thread) NumReplies() (count int) {
 
 // get posts to a thread
 func (thread *Thread) Posts() (posts []Post, err error) {
-	rows, err := Db.Query("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE thread_id = $1", thread.Id)
+	rows, err := Db.Query("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE thread_id=?", thread.Id)
 	defer rows.Close()
 	if err != nil {
 		return
@@ -52,7 +52,7 @@ func (thread *Thread) Posts() (posts []Post, err error) {
 // get the user who started this thread
 func (thread *Thread) User() (user User) {
 	user = User{}
-	Db.QueryRow("SELECT id, uuid, name, email, created_at FROM users WHERE id = $1", thread.UserId).
+	Db.QueryRow("SELECT id, uuid, name, email, created_at FROM users WHERE id=?", thread.UserId).
 		Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.CreatedAt)
 	return
 }
@@ -78,7 +78,7 @@ func Threads() (threads []Thread, err error) {
 // get a thread by the UUID
 func ThreadByUUID(uuid string) (conv Thread, err error) {
 	conv = Thread{}
-	err = Db.QueryRow("SELECT id, uuid, topic, user_id, created_at FROM threads WHERE uuid = $1", uuid).
+	err = Db.QueryRow("SELECT id, uuid, topic, user_id, created_at FROM threads WHERE uuid=?", uuid).
 		Scan(&conv.Id, &conv.Uuid, &conv.Topic, &conv.UserId, &conv.CreatedAt)
 	return
 }
