@@ -10,20 +10,20 @@ import (
 )
 
 type sqlInfo struct {
-	driverName string
-	username string
-	password string
-	database string
+	DriverName string
+	Username string
+	Password string
+	Database string
 }
 
 var info sqlInfo
 var Db *sql.DB
 
 func init() {
-	loadConfig()
+	loadSqlInfo()
 	var err error
-	dataSourceName := fmt.Sprintf("%s:%s@/%s", info.username, info.password, info.database)
-	Db, err = sql.Open(info.driverName, dataSourceName)
+	dataSourceName := fmt.Sprintf("%s:%s@/%s", info.Username, info.Password, info.Database)
+	Db, err = sql.Open(info.DriverName, dataSourceName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,10 +31,10 @@ func init() {
 }
 
 
-func loadConfig() {
-	file, err := os.Open("sql.json")
+func loadSqlInfo() {
+	file, err := os.Open("data/sql.json")
 	if err != nil {
-		log.Fatalln("Cannot open mysql file", err)
+		log.Fatalln("Cannot open sql file", err)
 	}
 	decoder := json.NewDecoder(file)
 	info = sqlInfo{}
