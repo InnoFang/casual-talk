@@ -2,11 +2,11 @@ package main
 
 import (
 	"net/http"
+	"casual-talk/routes"
+	"time"
 	"os"
 	"log"
 	"encoding/json"
-	"casual-talk/route"
-	"time"
 )
 
 type Configuration struct {
@@ -17,18 +17,8 @@ type Configuration struct {
 }
 
 var config Configuration
-var logger *log.Logger
 
 func init() {
-	loadConfig()
-	file, err := os.OpenFile("casual-talk.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatalln("Failed to open log file", err)
-	}
-	logger = log.New(file, "[INFO] ", log.Ldate|log.Ltime|log.Lshortfile)
-}
-
-func loadConfig() {
 	file, err := os.Open("config.json")
 	if err != nil {
 		log.Fatalln("Cannot open config file", err)
@@ -50,21 +40,21 @@ func main() {
 
 	mapper := map[string]func(http.ResponseWriter, *http.Request){
 		// defined in route/index.go
-		"/":    route.Index,
-		"/err": route.Err,
+		"/":    routes.Index,
+		"/err": routes.Err,
 
 		// defined in route/auth.go
-		"/login":          route.Login,
-		"/logout":         route.Logout,
-		"/signup":         route.Signup,
-		"/signup_account": route.SignupAccount,
-		"/authenticate":   route.Authenticate,
+		"/login":          routes.Login,
+		"/logout":         routes.Logout,
+		"/signup":         routes.Signup,
+		"/signup_account": routes.SignupAccount,
+		"/authenticate":   routes.Authenticate,
 
 		// defined in route/thread.go
-		"/thread/new":    route.NewThread,
-		"/thread/create": route.CreateThread,
-		"/thread/post":   route.PostThread,
-		"/thread/read":   route.ReadThread,
+		"/thread/new":    routes.NewThread,
+		"/thread/create": routes.CreateThread,
+		"/thread/post":   routes.PostThread,
+		"/thread/read":   routes.ReadThread,
 	}
 
 	for pattern, handler := range mapper {
