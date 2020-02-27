@@ -20,6 +20,7 @@ var config Configuration
 var logger *log.Logger
 
 func init() {
+	loadConfig()
 	file, err := os.OpenFile("casual-talk.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalln("Failed to open log file", err)
@@ -28,13 +29,13 @@ func init() {
 }
 
 func loadConfig() {
-	file, err := os.Open("config.json");
+	file, err := os.Open("config.json")
 	if err != nil {
 		log.Fatalln("Cannot open config file", err)
 	}
 	decoder := json.NewDecoder(file)
 	config = Configuration{}
-	err = decoder.Decode(&config);
+	err = decoder.Decode(&config)
 	if err != nil {
 		log.Fatalln("Cannot get configuration from file", err)
 	}
