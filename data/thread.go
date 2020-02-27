@@ -1,13 +1,15 @@
 package data
 
-import "time"
+import (
+	"time"
+)
 
 type Thread struct {
 	Id       int
 	Uuid     string
 	Topic    string
 	UserId   int
-	CreateAt time.Time
+	CreatedAt time.Time
 }
 
 type Post struct {
@@ -16,9 +18,35 @@ type Post struct {
 	Body     string
 	UserId   int
 	Thread   int
-	CreateAt time.Time
+	CreatedAt time.Time
 }
 
-func Threads() ([]Thread, error) {
-	return nil, nil
+func Threads() (threads []Thread,err error) {
+	rows, err := Db.Query("SELECT id, uuid, topic, user_id, created_at FROM threads ORDER BY created_at DESC")
+	defer rows.Close()
+	if err != nil {
+		return
+	}
+	for rows.Next() {
+		th := Thread{}
+		if err = rows.Scan(&th.Id, &th.Uuid, &th.Topic, &th.UserId, &th.CreatedAt); err != nil {
+			return
+		}
+		threads = append(threads, th)
+	}
+	return
+}
+
+func (thread *Thread) NumReplies() (count int) {
+	rows, err := Db.Query("SELECT count(*) FROM posts where thread_id=$1", thread.Id)
+	defer rows.Close()
+	if err != nil {
+		return
+	}
+	for rows.Next() {
+		if err = rows.Scan(&count); err != nil {
+			return
+		}
+	}
+	return
 }
