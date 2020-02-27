@@ -1,6 +1,6 @@
 {
   "driverName"  : "mysql",
   "username": "",
-  "password": ""
+  "password": "",
   "database": "casual_talk"
 }
