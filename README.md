@@ -1,6 +1,6 @@
 # casual-talk
 
-Build a forum in Go. Learn from [gwp](https://github.com/sausheong/gwp) and make some improvements.
+Build a forum in Go. Learn from [gwp](https://github.com/sausheong/gwp) and make some change.
 
 [![](https://img.shields.io/badge/license-MIT-yellowgreen)](./LICENSE) ![](https://img.shields.io/badge/database-MySQL-blue)
 
