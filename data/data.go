@@ -25,7 +25,9 @@ var Db *sql.DB
 func init() {
 	loadSqlInfo()
 	var err error
-	dataSourceName := fmt.Sprintf("%s:%s@/%s", info.Username, info.Password, info.Database)
+	// Must to be append '?parseTime=true' after the 'dataSourceName',
+	// or it will occur 'unsupported Scan, storing driver.Value type []uint8 into type *time.Time'
+	dataSourceName := fmt.Sprintf("%s:%s@/%s?parseTime=true", info.Username, info.Password, info.Database)
 	Db, err = sql.Open(info.DriverName, dataSourceName)
 	if err != nil {
 		log.Fatal(err)

@@ -35,10 +35,10 @@ func (thread *Thread) NumReplies() (count int) {
 // get posts to a thread
 func (thread *Thread) Posts() (posts []Post, err error) {
 	rows, err := Db.Query("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE thread_id=?", thread.Id)
-	defer rows.Close()
 	if err != nil {
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		post := Post{}
 		if err = rows.Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt); err != nil {
@@ -60,10 +60,10 @@ func (thread *Thread) User() (user User) {
 // get all threads in the database and returns it
 func Threads() (threads []Thread, err error) {
 	rows, err := Db.Query("SELECT id, uuid, topic, user_id, created_at FROM threads ORDER BY created_at DESC")
-	defer rows.Close()
 	if err != nil {
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		th := Thread{}
 		if err = rows.Scan(&th.Id, &th.Uuid, &th.Topic, &th.UserId, &th.CreatedAt); err != nil {

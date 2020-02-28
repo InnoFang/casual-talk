@@ -20,7 +20,7 @@ func Signup(writer http.ResponseWriter, request *http.Request) {
 	utils.GenerateHTML(writer, nil, "login.layout", "public.navbar", "signup")
 }
 
-// POST /signup
+// POST /signup_account
 // create the user account
 func SignupAccount(writer http.ResponseWriter, request *http.Request) {
 	err := request.ParseForm()

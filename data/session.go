@@ -31,10 +31,10 @@ func (session *Session) Valid() (valid bool, err error) {
 // delete session from database
 func (session *Session) DeleteByUUID() (err error) {
 	stmt, err := Db.Prepare("DELETE FROM sessions WHERE uuid=?")
-	defer stmt.Close()
 	if err != nil {
 		return
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(session.Uuid)
 	return
