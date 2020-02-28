@@ -1,4 +1,4 @@
-FROM golang:latest
+FROM golang:1.13.6
 
 RUN mkdir -p $GOPATH/src/casual-talk
 WORKDIR $GOPATH/src/casual-talk
